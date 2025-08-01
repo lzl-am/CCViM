@@ -118,7 +118,7 @@ The version of mamba_ssm can be found here. {[mamba_ssm](https://github.com/stat
 
 | Tasks     |     weights |
 |:----------|------------:|
-| CPM17     | [weight]() | 
+| CPM17     | [weight](https://drive.google.com/file/d/1sOR_gxFEuFy4ofrJA2XRSVcpaZT9HT8B/view?usp=sharing) | 
 | Kumar     | [weight]() |
 | ISIC17    | [weight](https://drive.google.com/file/d/1e16OoWkeTOgAPv6ayv9vn4d-uHfl371Z/view?usp=sharing) | 
 | ISIC18    | [weight](https://drive.google.com/file/d/1R20ea_rZmkjjAgOe0husqieCSq49hX6o/view?usp=sharing) | 
