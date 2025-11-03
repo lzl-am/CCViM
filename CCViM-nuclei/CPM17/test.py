@@ -15,16 +15,21 @@ from datetime import datetime
 current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 # Create the main parser
 parser = argparse.ArgumentParser(description="CCViM Pytorch Inference")
+# GPU 配置
 parser.add_argument('--gpu', default='1', help='GPU list')
+# 模型配置
 parser.add_argument('--nr_types', type=int, default=None, help='Number of nuclei types to predict')
 parser.add_argument('--model_path', default='', help='Path to saved checkpoint')
 parser.add_argument('--model_mode', default='fast', choices=['original', 'fast'], help='Model mode: original or fast')
+# 线程与批次配置
 parser.add_argument('--nr_inference_workers', type=int, default=8, help='Number of workers during inference')
 parser.add_argument('--nr_post_proc_workers', type=int, default=16, help='Number of workers during post-processing')
 parser.add_argument('--batch_size', type=int, default=16, help='Batch size per GPU')
-parser.add_argument('--input_dir', default="/cpm17/test/Images", help='Path to input data directory')
-parser.add_argument('--output_dir', default= f'/CCViM-nuclei/CPM17/infer_output/CCM_UNET_{current_time}', help='Path to output directory')
+# 输入输出配置
+parser.add_argument('--input_dir', default="/seu_share/home/220232363/data/cpm17/test/Images", help='Path to input data directory')
+parser.add_argument('--output_dir', default= f'/seu_share/home/220232363/baseline/CCViM//CCViM-nuclei/CPM17/infer_output/CCM_UNET_{current_time}', help='Path to output directory')
 parser.add_argument('--mem_usage', type=float, default=0.2, help='Memory (physical + swap) to be used for caching')
+# 结果保存配置
 parser.add_argument('--draw_dot', action='store_true', help='Draw nuclei centroid on overlay')
 parser.add_argument('--save_qupath', action='store_true', help='Save QuPath v0.2.3 compatible format')
 parser.add_argument('--save_raw_map', action='store_true', default=True,help='Save raw prediction')
@@ -50,8 +55,7 @@ method_args = {
         },
         'model_path': args.model_path,
     },
-    'type_info_path': None if args.type_info_path == '' \
-        else args.type_info_path,
+    'type_info_path': None,
 }
 
 # ***

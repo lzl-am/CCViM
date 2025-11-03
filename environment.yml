@@ -1,0 +1,24 @@
+name: CCViM
+channels:
+- pytorch
+- conda-forge
+- defaults
+dependencies:
+- python=3.9
+- torchvision==0.14.0
+- torchaudio==0.13.0
+- timm==0.4.12
+- triton==2.0.0
+- packaging
+- pytest
+- chardet
+- yacs
+- termcolor
+- submitit
+- tensorboardX
+- scikit-learn
+- matplotlib
+- h5py
+- SimpleITK
+- scikit-image
+- medpy

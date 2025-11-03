@@ -244,7 +244,32 @@ def viz_step_output(raw_data, nr_types=None):
         true_tp, pred_tp = raw_data["tp"]
 
     aligned_shape = [list(imgs.shape), list(true_np.shape), list(pred_np.shape)]
-    aligned_shape = np.min(np.array(aligned_shape), axis=0)[1:3]
+
+    print("=== aligned_shape 结构排查 ===")
+    print("aligned_shape 类型:", type(aligned_shape))  # 应是列表或元组
+    print("aligned_shape 长度:", len(aligned_shape))  # 查看有多少个元素
+    print("aligned_shape 内容:", aligned_shape)  # 打印每个元素的具体值
+    print("每个元素的形状/长度:", [np.shape(elem) for elem in aligned_shape])  # 查看元素是否统一
+
+    # === 修复：统一维度（补全通道）+ 计算最小H/W ===
+    print("=== aligned_shape 修复后验证 ===")
+    # 1. 统一维度：给3维元素（缺通道）补充通道维度（默认补3，如RGB；若业务是灰度图可补1）
+    valid_shapes = []
+    for shape in aligned_shape:
+        if len(shape) == 3:  # 3维元素：(B, H, W) → 补通道C（这里假设C=3，需根据业务调整）
+            shape_with_channel = shape + [3]  # 变成 (B, H, W, C)
+            valid_shapes.append(shape_with_channel)
+        elif len(shape) == 4:  # 4维元素：(B, H, W, C) → 直接保留
+            valid_shapes.append(shape)
+        else:  # 异常长度（如1/2/5维）→ 按默认形状填充（避免报错，需根据业务调整）
+            valid_shapes.append([2, 256, 256, 3])  # 默认批量2、256x256、3通道
+
+    # 2. 验证统一后的维度（可选，确认修复效果）
+    print("统一后每个元素长度:", [len(s) for s in valid_shapes])  # 应全为4
+
+    # 3. 原逻辑：创建数组→取最小→截取H/W（索引1和2）
+    aligned_shape = np.min(np.array(valid_shapes), axis=0)[1:3]
+    print("最终取到的H/W:", aligned_shape)  # 应输出 [256 256]（或更小值，若有不同尺寸）
 
     cmap = plt.get_cmap("jet") # 是 Matplotlib 中用于获取颜色映射（colormap）的函数
 

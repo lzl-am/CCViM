@@ -1,0 +1,5 @@
+__pycache__/
+CCViM-nuclei/CPM17/output
+CCViM-nuclei/CPM17/pre_trained_weights/*
+CCViM-nuclei/CPM17/infer_output
+CCViM-nuclei/CPM17/debug.log

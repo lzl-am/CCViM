@@ -12,7 +12,7 @@ from einops import rearrange, repeat
 from timm.models.layers import DropPath, trunc_normal_
 from timm.models.registry import register_model
 # from fvcore.nn import FlopCountAnalysis, flop_count_str, flop_count, parameter_count
-from models.localcmunet.mamba.multi_mamba import MultiScan
+from models.CCViMUNet.mamba.multi_mamba import MultiScan
 
 DropPath.__repr__ = lambda self: f"timm.DropPath({self.drop_prob})"
 

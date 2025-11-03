@@ -74,11 +74,11 @@ class InferManager(object):
         net = torch.nn.DataParallel(net)
         net = net.to("cuda")
 
-        module_lib = import_module("models.main_model.run_desc")
+        module_lib = import_module("models.run_desc")
         run_step = getattr(module_lib, "infer_step")
         self.run_step = lambda input_batch: run_step(input_batch, net)
 
-        module_lib = import_module("models.main_model.post_proc")
+        module_lib = import_module("models.post_proc")
         self.post_proc_func = getattr(module_lib, "process")
         return
 

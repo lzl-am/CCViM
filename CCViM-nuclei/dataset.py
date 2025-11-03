@@ -52,13 +52,18 @@ class __CPM17(__AbstractDataset):
     """
 
     def load_img(self, path):
+        """从指定路径读取图像文件，并转换为统一的颜色空间格式"""
         return cv2.cvtColor(cv2.imread(path), cv2.COLOR_BGR2RGB)
 
     def load_ann(self, path, with_type=False):
         assert not with_type, "Not support"
         # assumes that ann is HxW
+        # 使用 scipy.io 读取 .mat 格式的标注文件
+        # 从读取的 .mat 文件中提取键为 inst_map 的数据，即实例映射矩阵
         ann_inst = sio.loadmat(path)["inst_map"]
         ann_inst = ann_inst.astype("int32")
+        # 在数组的最后一个维度（通道维度）增加一个维度，将形状从 (H, W) 转换为 (H, W, 1)
+        # 目的是与图像的形状 (H, W, 3) 保持维度一致性（均为 3 维数组，前两维为空间尺寸，第三维为通道），方便后续处理（如拼接、模型输入对齐）
         ann = np.expand_dims(ann_inst, -1)
         return ann
 

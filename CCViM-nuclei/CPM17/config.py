@@ -45,14 +45,14 @@ class Config(object):
                 raise Exception("If using `fast` mode, input shape must be [256,256] and output shape must be [164,164]")
         current_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         self.dataset_name = "cpm17"  # extracts dataset info from dataset_CKC.py
-        self.log_dir = f"/CPM17/output/CCM_UNET_{current_time}" # where checkpoints will be saved
+        self.log_dir = f"./output/CCM_UNET_{current_time}" # where checkpoints will be saved
 
         # paths to training and validation patches
         self.train_dir_list = [
-            "/cpm17/processed/cpm17/train/540x540_164x164"
+            "/seu_share/home/220232363/data/cpm17/processed/cpm17/train/540x540_164x164"
         ]
         self.valid_dir_list = [
-            "/cpm17/processed/cpm17/valid/540x540_164x164"
+            "/seu_share/home/220232363/data/cpm17/processed/cpm17/valid/540x540_164x164"
         ]
 
         self.shape_info = {

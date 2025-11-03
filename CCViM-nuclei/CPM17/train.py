@@ -62,7 +62,10 @@ def worker_init_fn(worker_id):
 
 ####
 class TrainManager(Config):
-    """Either used to view the dataset or to initialise the main training loop."""
+    """
+    Either used to view the dataset or to initialise the main training loop.
+    get args from Config
+    """
 
     def __init__(self):
         super().__init__()
