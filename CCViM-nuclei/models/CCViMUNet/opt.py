@@ -1,3 +1,8 @@
+"""opt.py
+
+为 CCViMUNet 模型训练生成核心配置字典，配置内容直接对接 TrainManager 类
+"""
+
 import torch.optim as optim
 
 from run_utils.callbacks.base import (
@@ -15,7 +20,12 @@ from run_utils.engine import Events
 
 from models.targets import gen_targets, prep_sample
 from models.CCViMUNet.CCViMUNet import LCVMUNet as create_model
-from models.run_desc import proc_valid_step_output, train_step, valid_step, viz_step_output
+from models.run_desc import (
+    proc_valid_step_output,
+    train_step,
+    valid_step,
+    viz_step_output,
+)
 
 
 # TODO: training config only ?
@@ -30,8 +40,11 @@ def get_config(nr_type, mode):
                 "run_info": {
                     # may need more dynamic for each network
                     "net": {
+                        # 通过 lambda 函数延迟实例化 CCViMUNet 模型
                         "desc": lambda: create_model(
-                            input_channels=3, nr_types=nr_type,freeze=True,
+                            input_channels=3,  # 输入通道数，通常为 3（RGB 图像）
+                            nr_types=nr_type,  # 目标类型数量（如 2 类细胞）
+                            freeze=True,  # 冻结骨干网络，仅训练分类头
                             load_ckpt_path="./pre_trained_weights/local_vssm_small.ckpt",
                         ),
                         "optimizer": [
@@ -43,27 +56,44 @@ def get_config(nr_type, mode):
                                 "weight_decay": 1e-2,
                             },
                         ],
-                        "lr_scheduler": lambda x: optim.lr_scheduler.CosineAnnealingLR(x, T_max=100, eta_min=0.00001),
+                        "lr_scheduler": lambda x: optim.lr_scheduler.CosineAnnealingLR(
+                            x, T_max=100, eta_min=0.00001
+                        ),
                         "extra_info": {
                             "loss": {
-                                "np": {"bce": 1, "dice": 1},
-                                "hv": {"mse": 1, "msge": 1},
-                                "tp": {"bce": 1, "dice": 1},
+                                "np": {
+                                    "bce": 1,
+                                    "dice": 1,
+                                },  # 核分割损失（BCE+Dice，权重1:1）
+                                "hv": {
+                                    "mse": 1,
+                                    "msge": 1,
+                                },  # 偏移向量损失（MSE+MSGE，权重1:1）
+                                "tp": {
+                                    "bce": 1,
+                                    "dice": 1,
+                                },  # 类型分类损失（BCE+Dice，权重1:1）
                             },
                         },
-                        'pretrained': 1,
+                        # 预训练权重加载：1表示加载指定路径的预训练权重（对应create_model的load_ckpt_path）
+                        "pretrained": 1,
                     },
                 },
                 "target_info": {"gen": (gen_targets, {}), "viz": (prep_sample, {})},
-                "batch_size": {"train": 32, "valid": 32,},  # engine name : value
-                "nr_epochs": 100,
+                "batch_size": {
+                    "train": 32,
+                    "valid": 32,
+                },  # 单GPU批次大小（训练/验证均为32）
+                "nr_epochs": 100,  # 该阶段训练100轮
             },
             {
                 "run_info": {
                     # may need more dynamic for each network
                     "net": {
                         "desc": lambda: create_model(
-                            input_channels=3, nr_types=nr_type,freeze=False,
+                            input_channels=3,
+                            nr_types=nr_type,
+                            freeze=False,
                             load_ckpt_path=None,
                         ),
                         "optimizer": [
@@ -75,7 +105,9 @@ def get_config(nr_type, mode):
                                 "weight_decay": 1e-2,
                             },
                         ],
-                        "lr_scheduler": lambda x: optim.lr_scheduler.CosineAnnealingLR(x, T_max=100, eta_min=0.00001),
+                        "lr_scheduler": lambda x: optim.lr_scheduler.CosineAnnealingLR(
+                            x, T_max=100, eta_min=0.00001
+                        ),
                         "extra_info": {
                             "loss": {
                                 "np": {"bce": 1, "dice": 1},
@@ -89,7 +121,10 @@ def get_config(nr_type, mode):
                     },
                 },
                 "target_info": {"gen": (gen_targets, {}), "viz": (prep_sample, {})},
-                "batch_size": {"train": 32, "valid": 32,},  # batch size per gpu
+                "batch_size": {
+                    "train": 32,
+                    "valid": 32,
+                },  # batch size per gpu
                 "nr_epochs": 200,
             },
         ],
@@ -112,10 +147,10 @@ def get_config(nr_type, mode):
                     ],
                     Events.EPOCH_COMPLETED: [
                         TrackLr(),
-                        PeriodicSaver(), # save checkpoints
-                        VisualizeOutput(viz_step_output), # 把输出的图像进行可视化
+                        PeriodicSaver(),  # save checkpoints
+                        VisualizeOutput(viz_step_output),  # 把输出的图像进行可视化
                         LoggingEpochOutput(),
-                        TriggerEngine("valid"), # 运行验证的
+                        TriggerEngine("valid"),  # 运行验证的
                         ScheduleLr(),
                     ],
                 },
@@ -127,7 +162,9 @@ def get_config(nr_type, mode):
                 "reset_per_run": True,  # * to stop aggregating output etc. from last run
                 # callbacks are run according to the list order of the event
                 "callbacks": {
-                    Events.STEP_COMPLETED: [AccumulateRawOutput(),],
+                    Events.STEP_COMPLETED: [
+                        AccumulateRawOutput(),
+                    ],
                     Events.EPOCH_COMPLETED: [
                         # TODO: is there way to preload these ?
                         ProcessAccumulatedRawOutput(

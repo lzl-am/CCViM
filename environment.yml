@@ -22,3 +22,12 @@ dependencies:
 - SimpleITK
 - scikit-image
 - medpy
+- pip:
+    - mamba_ssm==1.0.1
+    - causal_conv1d==1.0.0
+    - opencv-python==4.9.0.80
+    - thop
+    - docopt
+    - imgaug
+    - psutil
+    - pandas
